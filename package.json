@@ -1,0 +1,24 @@
+{
+  "name": "mwjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "scripts": {
+    "build": "tsc",
+	"build:watch": "tsc -w",
+	"prepublish": "tsc",
+	"start": ""
+  },
+  "keywords": [],
+  "author": "bitomic <alehandro.rzrv@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "fs": "0.0.1-security",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.8"
+  }
+}
