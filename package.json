@@ -4,13 +4,16 @@
   "description": "",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
+  "repository": {
+    "url": "https://github.com/bitomic/mwjs"
+  },
   "scripts": {
     "build": "tsc",
 	"build:watch": "tsc -w",
 	"prepublish": "tsc",
 	"start": ""
   },
-  "keywords": [],
+  "keywords": [ "mediawiki" ],
   "author": "bitomic <alehandro.rzrv@gmail.com>",
   "license": "MIT",
   "dependencies": {
