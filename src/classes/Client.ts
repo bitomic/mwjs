@@ -1,8 +1,10 @@
 import API, { IAPIOptions } from './API'
 import { chunkify, sleep } from '../utils'
-import fetch from 'node-fetch'
 import FormData from 'form-data'
+import querystring from 'querystring'
 import Signale from 'signale'
+
+import { IDeleteResponse, IEditResponse, IMoveResponse, IPurgeResponse } from '../typings'
 
 class Client {
 	private api: API
@@ -19,31 +21,37 @@ class Client {
 
 	async login() {
 		const status = await this.api.login()
-			.catch(e => this.logger.error('Could not login into your account.'))
+			.catch(e => {
+				this.logger.error('Could not login into your account.')
+				process.exit(1)
+			})
 		this.logger.success(`Successfully logged in as ${this.api.username}`)
+		return status
 	}
 
-	async delete({ title, reason }: { title: string, reason?: string }) {
-		const form = new FormData()
-		form.append('title', title)
-		if (reason) form.append('reason', reason)
-
-		const params = { action: 'delete' }
-		return await this.api.post({ params, form, csrf: true })
+	async delete({ title, reason }: { title: string, reason?: string }): Promise<IDeleteResponse> {
+		const params = {
+			action: 'delete',
+			title,
+			reason
+		}
+		return await this.api.post({ params, csrf: true })
 	}
 
-	async edit({ title, summary, text, minor, mode }: { title: string, summary?: string, text: string, minor?: boolean, mode?: 'text' | 'appendtext' | 'prependtext' }) {
+	async edit({ title, summary, text, minor, mode }: { title: string, summary?: string, text: string, minor?: boolean, mode?: 'text' | 'appendtext' | 'prependtext' }): Promise<IEditResponse> {
+		const params: querystring.ParsedUrlQueryInput = {
+			action: 'edit',
+			bot: true,
+			title,
+			summary,
+			minor
+		}
 		if (!mode) mode = 'text'
-		if (!minor) minor = false
-		const form = new FormData()
-		form.append('title', title)
-		if (summary) form.append('summary', summary)
-		form.append(mode, text)
-		const params = { action: 'edit', bot: true, minor }
-		return await this.api.post({ params, form, csrf: true })
+		params[mode] = text
+		return await this.api.post({ params, csrf: true })
 	}
 
-	async move(options: { from: string, to: string, reason?: string, noredirect?: boolean }) {
+	async move(options: { from: string, to: string, reason?: string, noredirect?: boolean }): Promise<IMoveResponse> {
 		const params = {
 			action: 'move',
 			...options
@@ -92,16 +100,17 @@ class Client {
 			action: 'upload',
 			ignorewarnings: 1
 		}
-		const req = await this.api.post({ params, form, csrf: true })
+		const req = await this.api.postForm({ params, form, csrf: true })
 		return req
 	}
 
 	// utilities
-	private async purgeAction(titles: string) {
-		const form = new FormData()
-		form.append('titles', titles)
-		const params = { action: 'purge' }
-		const req = await this.api.post({ params, form })
+	private async purgeAction(titles: string): Promise<IPurgeResponse> {
+		const params = {
+			action: 'purge',
+			titles
+		}
+		const req = await this.api.post({ params })
 		return req
 	}
 }
