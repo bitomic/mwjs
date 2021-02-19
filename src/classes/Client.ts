@@ -2,15 +2,25 @@ import API, { IAPIOptions } from './API'
 import { chunkify, sleep } from '../utils'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
+import Signale from 'signale'
 
 class Client {
 	private api: API
-	constructor(options: IAPIOptions) {
-		this.api = new API(options)
+	private logger: Signale.Signale
+	constructor(apiOptions: IAPIOptions, clientOptions?: { log: boolean }) {
+		this.api = new API(apiOptions)
+		this.logger = new Signale.Signale()
+		if (!clientOptions?.log) this.logger.disable()
+		this.logger.config({
+			displayDate: true,
+			displayTimestamp: true
+		})
 	}
 
 	async login() {
-		return await this.api.login()
+		const status = await this.api.login()
+			.catch(e => this.logger.error('Could not login into your account.'))
+		this.logger.success(`Successfully logged in as ${this.api.username}`)
 	}
 
 	async delete({ title, reason }: { title: string, reason?: string }) {
