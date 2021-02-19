@@ -64,3 +64,6 @@ client.post({
 	params, form	
 })
 ```
+
+# TODO
+- Support generators.
