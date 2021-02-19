@@ -2,30 +2,17 @@ import API, { IAPIOptions } from './API'
 import { chunkify, sleep } from '../utils'
 import FormData from 'form-data'
 import querystring from 'querystring'
-import Signale from 'signale'
 
 import { IDeleteResponse, IEditResponse, IMoveResponse, IPurgeResponse } from '../typings'
 
 class Client {
 	private api: API
-	private logger: Signale.Signale
 	constructor(apiOptions: IAPIOptions, clientOptions?: { log: boolean }) {
 		this.api = new API(apiOptions)
-		this.logger = new Signale.Signale()
-		if (!clientOptions?.log) this.logger.disable()
-		this.logger.config({
-			displayDate: true,
-			displayTimestamp: true
-		})
 	}
 
 	async login() {
 		const status = await this.api.login()
-			.catch(e => {
-				this.logger.error('Could not login into your account.')
-				process.exit(1)
-			})
-		this.logger.success(`Successfully logged in as ${this.api.username}`)
 		return status
 	}
 
